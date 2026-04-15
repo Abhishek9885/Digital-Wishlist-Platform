@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View a shared wishlist and reserve items as a guest — no account needed.">
+  <title>Shared Wishlist — Digital Wishlist Platform</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="brand-icon">🎁</div>
+        <span>Wishlist</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Loading -->
+    <div class="page-loader" id="share-loader">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Error State -->
+    <div class="empty-state hidden" id="share-error">
+      <div class="empty-state-icon">🔒</div>
+      <h3 id="share-error-title">Wishlist Not Found</h3>
+      <p id="share-error-msg">This wishlist may be private or the link is invalid.</p>
+      <a href="/" class="btn btn-primary">Go Home</a>
+    </div>
+
+    <!-- Wishlist Content -->
+    <div class="hidden" id="share-content">
+      <div class="share-hero">
+        <h1 id="share-title">Wishlist Title</h1>
+        <p id="share-description">Wishlist description</p>
+        <p style="margin-top:8px; font-size:0.9rem;">Shared by <span class="share-owner" id="share-owner">User</span></p>
+      </div>
+
+      <div class="items-list" id="share-items-list">
+        <!-- Dynamically populated -->
+      </div>
+
+      <div class="empty-state hidden" id="share-items-empty" style="padding:40px;">
+        <div class="empty-state-icon">📭</div>
+        <h3>No items in this wishlist</h3>
+        <p>The owner hasn't added any items yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/share.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Digital Wishlist Platform — Create, manage, and share wishlists. Let guests reserve items to avoid duplicate gifts.">
+  <title>Digital Wishlist Platform</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-brand">
+        <div class="brand-icon">🎁</div>
+        <span>Wishlist</span>
+      </div>
+      <div class="navbar-actions">
+        <button class="btn btn-secondary btn-sm" id="nav-login-btn" onclick="showAuthSection('login')">Log In</button>
+        <button class="btn btn-primary btn-sm" id="nav-register-btn" onclick="showAuthSection('register')">Sign Up</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero-section">
+    <div class="container">
+      <h1>Your <span class="gradient-text">Digital Wishlist</span><br>Made Simple</h1>
+      <p>Create beautiful wishlists, share them with friends and family, and let guests reserve items — no more duplicate gifts!</p>
+      <div>
+        <button class="btn btn-primary btn-lg" onclick="showAuthSection('register')">Get Started Free →</button>
+      </div>
+
+      <div class="hero-features">
+        <div class="hero-feature">
+          <div class="hero-feature-icon">📝</div>
+          <h3>Create Lists</h3>
+          <p>Organize your wishes into beautiful, shareable lists</p>
+        </div>
+        <div class="hero-feature">
+          <div class="hero-feature-icon">🔗</div>
+          <h3>Share Instantly</h3>
+          <p>One unique link for friends and family to view your list</p>
+        </div>
+        <div class="hero-feature">
+          <div class="hero-feature-icon">🎯</div>
+          <h3>Reserve Items</h3>
+          <p>Guests claim items without logging in — no duplicates</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Section -->
+  <section class="auth-container hidden" id="auth-section">
+    <div class="card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="auth-form" id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" class="form-control" id="login-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required minlength="6">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg" id="login-submit-btn">Log In</button>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form class="auth-form hidden" id="register-form" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="register-name">Full Name</label>
+          <input type="text" class="form-control" id="register-name" placeholder="Your full name" required maxlength="50">
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email Address</label>
+          <input type="email" class="form-control" id="register-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input type="password" class="form-control" id="register-password" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg" id="register-submit-btn">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>
