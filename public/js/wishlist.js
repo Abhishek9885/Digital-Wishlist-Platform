@@ -30,7 +30,7 @@ function logout() {
     return;
   }
   const name = localStorage.getItem('userName');
-  document.getElementById('user-name-display').textContent = `Welcome, ${name || 'User'}`;
+  document.getElementById('user-name-display').innerHTML = `Welcome, <span class="gradient-text">${name || 'User'}</span>`;
   loadWishlists();
   loadGlobalStats();
 })();

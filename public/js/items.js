@@ -40,7 +40,7 @@ function logout() {
   }
 
   const name = localStorage.getItem('userName');
-  document.getElementById('user-name-display').textContent = `Welcome, ${name || 'User'}`;
+  document.getElementById('user-name-display').innerHTML = `Welcome, <span class="gradient-text">${name || 'User'}</span>`;
   
   await loadWishlistDetail();
   await loadItems();

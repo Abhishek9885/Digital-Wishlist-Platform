@@ -124,8 +124,10 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shine 4s linear infinite;
+  animation: shine 3s linear infinite;
   display: inline-block;
+  font-weight: 700;
+  filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.3));
 }
 .gradient-text-inline {
   display: inline-block;
@@ -244,9 +246,25 @@ a:hover {
 }
 
 .navbar-user {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-right: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-right: 12px;
+}
+
+.theme-toggle-btn i {
+  transition: transform 0.5s var(--transition-bounce), color 0.3s ease;
+}
+
+.theme-toggle-btn:hover i {
+  color: var(--warning);
+  transform: rotate(30deg) scale(1.2);
+  filter: drop-shadow(0 0 8px var(--warning));
+}
+
+.theme-toggle-btn .icon-moon:hover {
+  color: var(--accent-purple);
+  filter: drop-shadow(0 0 8px var(--accent-purple));
 }
 
 /* ---- Buttons ---- */
@@ -307,7 +325,10 @@ a:hover {
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent-solid);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  transform: translateY(-2px);
 }
 
 .btn-danger {

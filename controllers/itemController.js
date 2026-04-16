@@ -185,7 +185,7 @@ exports.scrapeUrl = async (req, res) => {
     // Determine the source site
     const detectSite = (urlStr) => {
       const u = urlStr.toLowerCase();
-      if (u.includes('amazon.')) return 'Amazon';
+      if (u.includes('amazon.') || u.includes('amzn.')) return 'Amazon';
       if (u.includes('flipkart.com')) return 'Flipkart';
       return 'Web';
     };
@@ -196,8 +196,10 @@ exports.scrapeUrl = async (req, res) => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.google.com/'
       },
-      timeout: 10000
+      timeout: 10000,
+      maxRedirects: 5
     });
 
     const $ = cheerio.load(html);
@@ -209,6 +211,31 @@ exports.scrapeUrl = async (req, res) => {
       sourceSite
     };
 
+    const cleanPrice = (priceStr) => {
+      if (!priceStr) return 0;
+      // Remove all characters except digits, dots, and commas
+      let p = priceStr.replace(/[^\d.,]/g, '');
+      
+      // Heuristic: If there are multiple commas, they are thousands separators
+      // If there is a dot followed by 2 digits at the end, it's a decimal
+      const lastDot = p.lastIndexOf('.');
+      const lastComma = p.lastIndexOf(',');
+
+      if (lastComma > lastDot) {
+        // Comma is the decimal separator (European style: 1.000,00)
+        if (p.length - lastComma === 3) {
+          p = p.replace(/\./g, '').replace(',', '.');
+        } else {
+          p = p.replace(/,/g, '');
+        }
+      } else {
+        // Dot is the decimal separator (Indian/US style: 1,00,000.00)
+        p = p.replace(/,/g, '');
+      }
+      
+      return parseFloat(p) || 0;
+    };
+
     // --- Generic & OG Tags first ---
     metadata.name = 
       $('meta[property="og:title"]').attr('content') || 
@@ -216,7 +243,8 @@ exports.scrapeUrl = async (req, res) => {
       $('h1').first().text().trim();
 
     metadata.imageUrl = 
-      $('meta[property="og:image"]').attr('content');
+      $('meta[property="og:image"]').attr('content') ||
+      $('link[rel="image_src"]').attr('href');
 
     metadata.description = 
       $('meta[property="og:description"]').attr('content') || 
@@ -225,23 +253,43 @@ exports.scrapeUrl = async (req, res) => {
     // --- Site-Specific Refinement ---
     if (sourceSite === 'Amazon') {
       metadata.name = $('#productTitle').text().trim() || metadata.name;
-      metadata.imageUrl = metadata.imageUrl || $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src');
-      metadata.description = metadata.description || $('#productDescription').text().trim();
+      metadata.imageUrl = metadata.imageUrl || $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || $('#main-image').attr('src');
+      metadata.description = metadata.description || $('#productDescription').text().trim() || $('#feature-bullets').text().trim();
       
-      const amazonPrice = $('.a-price .a-offscreen').first().text() || $('#priceblock_ourprice').text() || $('#priceblock_dealprice').text();
+      const amazonPrice = 
+        $('.a-price .a-offscreen').first().text() || 
+        $('.a-price-whole').first().text() ||
+        $('#priceblock_ourprice').text() || 
+        $('#priceblock_dealprice').text() ||
+        $('.offer-price').first().text();
+        
       if (amazonPrice) {
-        const cleaned = amazonPrice.replace(/[^\d.,]/g, '').replace(',', '.');
-        metadata.price = parseFloat(cleaned) || 0;
+        metadata.price = cleanPrice(amazonPrice);
       }
-    } else if (sourceSite === 'Flipkart') {
+    }
+ else if (sourceSite === 'Flipkart') {
       metadata.name = $('.B_NuCI').text().trim() || metadata.name;
-      // Flipkart often puts main image in a specific class or uses a data attribute
-      metadata.imageUrl = metadata.imageUrl || $('._396cs4._2amPT_._3q69OO img').attr('src') || $('img._2r_T1_').attr('src');
+      metadata.imageUrl = metadata.imageUrl || $('._396cs4._2amPT_._3q69OO img').attr('src') || $('img._2r_T1_').attr('src') || $('.nx-title img').attr('src');
       
       const flipkartPrice = $('._30jeq3._16G7S8').first().text() || $('._30jeq3').first().text();
       if (flipkartPrice) {
-        const cleaned = flipkartPrice.replace(/[^\d]/g, ''); // Flipkart prices usually don't have decimals
+        const cleaned = flipkartPrice.replace(/[^\d]/g, '');
         metadata.price = parseFloat(cleaned) || 0;
+      }
+    }
+
+    // --- Price Fallback (Search for currency patterns) ---
+    if (metadata.price === 0) {
+      // Try OG price tags
+      const ogPrice = $('meta[property="product:price:amount"]').attr('content') || $('meta[property="og:price:amount"]').attr('content');
+      if (ogPrice) {
+        metadata.price = cleanPrice(ogPrice);
+      } else {
+        // Look for common price elements on generic pages
+        const genericPrice = $('.price').text() || $('.amount').text() || $('[itemprop="price"]').attr('content');
+        if (genericPrice) {
+          metadata.price = cleanPrice(genericPrice);
+        }
       }
     }
 
@@ -251,12 +299,6 @@ exports.scrapeUrl = async (req, res) => {
     }
     if (metadata.description && metadata.description.length > 500) {
       metadata.description = metadata.description.substring(0, 497) + '...';
-    }
-
-    // Try to get price from OG tags if site-specific failed
-    if (metadata.price === 0) {
-      const ogPrice = $('meta[property="product:price:amount"]').attr('content');
-      if (ogPrice) metadata.price = parseFloat(ogPrice.replace(',', '.')) || 0;
     }
 
     res.json(metadata);
