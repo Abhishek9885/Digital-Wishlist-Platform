@@ -28,6 +28,11 @@ const itemSchema = new mongoose.Schema({
     trim: true,
     default: ''
   },
+  imageUrl: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high'],

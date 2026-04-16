@@ -7,6 +7,7 @@ const API_BASE = '';
 // ---- Toast ----
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
@@ -84,8 +85,19 @@ function renderSharePage(wishlist, items) {
 function renderItems(items) {
   const list = document.getElementById('share-items-list');
 
+  // Update Stats for Guests
+  const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
+  document.getElementById('stats-share-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+  document.getElementById('stats-share-count').textContent = items.length;
+  document.getElementById('stats-share-reserved').textContent = items.filter(i => i.isReserved).length;
+
   list.innerHTML = items.map((item, index) => `
     <div class="item-card animate-fade-in-up ${item.isReserved ? 'reserved' : ''}" style="animation-delay: ${index * 0.05}s" id="share-item-${item._id}">
+      ${item.imageUrl ? `
+        <div class="item-image">
+          <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+        </div>
+      ` : ''}
       <div class="item-info">
         <div class="item-name">
           ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.name)} <i data-lucide="external-link" class="icon-xs"></i></a>` : escapeHtml(item.name)}
@@ -99,10 +111,10 @@ function renderItems(items) {
       </div>
       <div class="item-actions">
         ${item.isReserved
-          ? `<button class="btn btn-danger btn-sm" onclick="unreserveItem('${item._id}')">Unreserve</button>`
-          : `<div class="reserve-form">
-              <input type="text" id="reserve-name-${item._id}" placeholder="Your name" maxlength="50">
-              <button class="btn btn-success btn-sm" onclick="reserveItem('${item._id}')">Reserve</button>
+          ? `<span class="text-muted" style="font-size: 0.85rem; font-style: italic;">Already Reserved</span>`
+          : `<div class="reserve-form" style="display:flex; gap:8px;">
+              <input type="text" id="reserve-name-${item._id}" placeholder="Your name" maxlength="50" class="form-control form-control-sm" style="font-size:0.8rem;">
+              <button class="btn btn-primary btn-sm" onclick="reserveItem('${item._id}')" style="white-space:nowrap;">Reserve</button>
             </div>`
         }
       </div>
@@ -142,27 +154,7 @@ async function reserveItem(itemId) {
   }
 }
 
-async function unreserveItem(itemId) {
-  if (!confirm('Remove your reservation for this item?')) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/items/${itemId}/unreserve`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Failed to unreserve item');
-    }
-
-    showToast('Reservation removed', 'success');
-    refreshItems();
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
+// NOTE: unreserveItem removed to comply with SRS FR-5.5 (Locked Reservations)
 
 async function refreshItems() {
   const token = getShareToken();

@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Manage your wishlists — create, edit, share, and track item reservations.">
-  <title>Dashboard — Digital Wishlist Platform</title>
+  <title>My Wishlists — Digital Wishlist Platform</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/js/common.js"></script>
 </head>
 <body>
+  <div class="noise-overlay"></div>
   <div class="ambient-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -18,27 +20,49 @@
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
-      <div class="navbar-brand">
+      <a href="/" class="navbar-brand">
         <div class="brand-icon"><i data-lucide="gift"></i></div>
         <span>Wishlist</span>
-      </div>
+      </a>
       <div class="navbar-actions">
+        <button class="btn btn-icon theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer;">
+          <i data-lucide="sun" class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon hidden"></i>
+        </button>
         <span class="navbar-user" id="user-name-display"></span>
         <button class="btn btn-secondary btn-sm" onclick="logout()">Log Out</button>
       </div>
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container animate-fade-in-up" style="margin-top: 40px;">
+    <!-- Wishlist Analytics Section -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Total Value</div>
+        <div class="stat-value" id="stats-total-value">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎁</div>
+        <div class="stat-label">Items Count</div>
+        <div class="stat-value" id="stats-total-items">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-label">Reserved</div>
+        <div class="stat-value" id="stats-total-reserved">0</div>
+      </div>
+    </div>
+
     <!-- Dashboard Header -->
     <div class="dashboard-header">
       <div>
-        <h1>My Wishlists</h1>
+        <h1>My <span class="gradient-text">Wishlists</span></h1>
       </div>
       <div style="display:flex; gap:12px; align-items:center;">
         <div class="dashboard-stats">
           <span class="stat-badge"><strong id="stats-lists">0</strong> Lists</span>
-          <span class="stat-badge"><strong id="stats-items">0</strong> Items</span>
         </div>
         <button class="btn btn-primary" id="create-wishlist-btn" onclick="openCreateWishlistModal()">+ New Wishlist</button>
       </div>
@@ -53,32 +77,8 @@
     <div class="empty-state hidden" id="empty-state">
       <div class="empty-state-icon">📋</div>
       <h3>No wishlists yet</h3>
-      <p>Create your first wishlist to get started!</p>
-      <button class="btn btn-primary" onclick="openCreateWishlistModal()">+ Create Wishlist</button>
-    </div>
-
-    <!-- Items Section (shown when a wishlist is selected) -->
-    <div class="items-section hidden" id="items-section">
-      <div class="card">
-        <div class="items-header">
-          <div>
-            <h3 id="items-wishlist-title">Items</h3>
-            <p class="text-muted" style="font-size:0.85rem; margin-top:4px;" id="items-wishlist-desc"></p>
-          </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn btn-primary btn-sm" id="add-item-btn" onclick="openAddItemModal()">+ Add Item</button>
-            <button class="btn btn-secondary btn-sm" onclick="closeItemsSection()">← Back</button>
-          </div>
-        </div>
-        <div class="items-list" id="items-list">
-          <!-- Dynamically populated -->
-        </div>
-        <div class="empty-state hidden" id="items-empty-state" style="padding:40px;">
-          <div class="empty-state-icon">🎯</div>
-          <h3>No items yet</h3>
-          <p>Add your first item to this wishlist!</p>
-        </div>
-      </div>
+      <p class="text-muted">Create your first wishlist to get started!</p>
+      <button class="btn btn-primary" onclick="openCreateWishlistModal()" style="margin-top:16px;">+ Create Wishlist</button>
     </div>
   </div>
 
@@ -108,50 +108,9 @@
             <span class="toggle-label">Make Public (shareable)</span>
           </div>
         </div>
-        <div class="form-actions" style="display:flex; gap:10px;">
-          <button type="submit" class="btn btn-primary" style="flex:1;" id="wishlist-submit-btn">Create Wishlist</button>
-          <button type="button" class="btn btn-secondary" onclick="closeModal('wishlist-modal')">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add/Edit Item Modal -->
-  <div class="modal-overlay" id="item-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 id="item-modal-title">Add Item</h2>
-        <button class="modal-close" onclick="closeModal('item-modal')">✕</button>
-      </div>
-      <form onsubmit="handleItemSubmit(event)">
-        <input type="hidden" id="item-edit-id">
-        <div class="form-group">
-          <label for="item-name">Item Name</label>
-          <input type="text" class="form-control" id="item-name" placeholder="e.g. Sony WH-1000XM5" required maxlength="100">
-        </div>
-        <div class="form-group">
-          <label for="item-description">Description</label>
-          <textarea class="form-control" id="item-description" placeholder="Details about the item" maxlength="500"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="item-price">Price (₹)</label>
-          <input type="number" class="form-control" id="item-price" placeholder="0" min="0" step="1">
-        </div>
-        <div class="form-group">
-          <label for="item-url">Link (URL)</label>
-          <input type="url" class="form-control" id="item-url" placeholder="https://example.com/product">
-        </div>
-        <div class="form-group">
-          <label for="item-priority">Priority</label>
-          <select class="form-control" id="item-priority">
-            <option value="low">Low</option>
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-        <div class="form-actions" style="display:flex; gap:10px;">
-          <button type="submit" class="btn btn-primary" style="flex:1;" id="item-submit-btn">Add Item</button>
-          <button type="button" class="btn btn-secondary" onclick="closeModal('item-modal')">Cancel</button>
+        <div class="form-actions" style="display:flex; gap:12px; margin-top:24px;">
+          <button type="submit" class="btn btn-primary" style="flex:2;" id="wishlist-submit-btn">Save Wishlist</button>
+          <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal('wishlist-modal')">Cancel</button>
         </div>
       </form>
     </div>
@@ -160,7 +119,7 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="/js/dashboard.js"></script>
+  <script src="/js/wishlist.js"></script>
   <script>lucide.createIcons();</script>
 </body>
 </html>

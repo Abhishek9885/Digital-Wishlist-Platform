@@ -7,8 +7,10 @@
   <title>Shared Wishlist — Digital Wishlist Platform</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/js/common.js"></script>
 </head>
 <body>
+  <div class="noise-overlay"></div>
   <div class="ambient-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -22,10 +24,35 @@
         <div class="brand-icon"><i data-lucide="gift"></i></div>
         <span>Wishlist</span>
       </a>
+      <div class="navbar-actions">
+        <button class="btn btn-icon theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer;">
+          <i data-lucide="sun" class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon hidden"></i>
+        </button>
+      </div>
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container animate-fade-in-up">
+    <!-- Wishlist Analytics Section (For Guests) -->
+    <div class="stats-grid" style="margin-top: 40px;">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Wishlist Value</div>
+        <div class="stat-value" id="stats-share-value">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎁</div>
+        <div class="stat-label">Total Items</div>
+        <div class="stat-value" id="stats-share-count">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-label">Reserved</div>
+        <div class="stat-value" id="stats-share-reserved">0</div>
+      </div>
+    </div>
+
     <!-- Loading -->
     <div class="page-loader" id="share-loader">
       <div class="spinner"></div>

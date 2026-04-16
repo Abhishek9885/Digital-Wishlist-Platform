@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Log in to your Digital Wishlist Platform account.">
+  <title>Log In — Digital Wishlist Platform</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/js/common.js"></script>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <div class="ambient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        <div class="brand-icon"><i data-lucide="gift"></i></div>
+        <span>Wishlist</span>
+      </a>
+      <div class="navbar-actions">
+        <button class="btn btn-icon theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer;">
+          <i data-lucide="sun" class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon hidden"></i>
+        </button>
+        <a href="/register.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="auth-container" style="margin-top: 80px;">
+    <div class="card">
+      <div class="section-header text-center" style="margin-bottom: 32px;">
+        <h2>Welcome <span class="gradient-text">Back</span></h2>
+        <p class="text-muted">Log in to manage your wishlists</p>
+      </div>
+
+      <form class="auth-form" id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" class="form-control" id="login-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required minlength="6">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg" id="login-submit-btn" style="width: 100%;">Log In</button>
+        </div>
+      </form>
+      
+      <div class="text-center" style="margin-top: 24px;">
+        <p class="text-muted">Don't have an account? <a href="/register.html" class="gradient-text" style="font-weight: 600;">Sign up free</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/auth.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -7,6 +7,7 @@ const API_BASE = '';
 // ---- Toast Notifications ----
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
@@ -18,37 +19,13 @@ function showToast(message, type = 'info') {
 // ---- Check if already logged in ----
 (function checkAuth() {
   const token = localStorage.getItem('token');
-  if (token) {
+  const path = window.location.pathname;
+  
+  // If logged in and on login/register page, go to dashboard
+  if (token && (path === '/login.html' || path === '/register.html')) {
     window.location.href = '/dashboard.html';
   }
 })();
-
-// ---- Tab Switching ----
-function switchTab(tab) {
-  const loginTab = document.getElementById('tab-login');
-  const registerTab = document.getElementById('tab-register');
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-
-  if (tab === 'login') {
-    loginTab.classList.add('active');
-    registerTab.classList.remove('active');
-    loginForm.classList.remove('hidden');
-    registerForm.classList.add('hidden');
-  } else {
-    registerTab.classList.add('active');
-    loginTab.classList.remove('active');
-    registerForm.classList.remove('hidden');
-    loginForm.classList.add('hidden');
-  }
-}
-
-// ---- Show Auth Section ----
-function showAuthSection(tab) {
-  document.getElementById('hero-section').classList.add('hidden');
-  document.getElementById('auth-section').classList.remove('hidden');
-  switchTab(tab);
-}
 
 // ---- Handle Login ----
 async function handleLogin(event) {
@@ -102,21 +79,8 @@ async function handleRegister(event) {
   const password = document.getElementById('register-password').value;
   const btn = document.getElementById('register-submit-btn');
 
-  // Client-side validation
   if (!name || !email || !password) {
     return showToast('Please fill in all fields', 'error');
-  }
-
-  if (name.length > 50) {
-    return showToast('Name must be 50 characters or less', 'error');
-  }
-
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    return showToast('Please enter a valid email', 'error');
-  }
-
-  if (password.length < 6) {
-    return showToast('Password must be at least 6 characters', 'error');
   }
 
   btn.disabled = true;

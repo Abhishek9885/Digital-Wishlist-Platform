@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage items in your wishlist.">
+  <title>Wishlist Details — Digital Wishlist Platform</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/js/common.js"></script>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <div class="ambient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="/dashboard.html" class="navbar-brand">
+        <div class="brand-icon"><i data-lucide="gift"></i></div>
+        <span>Wishlist</span>
+      </a>
+      <div class="navbar-actions">
+        <button class="btn btn-icon theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer;">
+          <i data-lucide="sun" class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon hidden"></i>
+        </button>
+        <span class="navbar-user" id="user-name-display"></span>
+        <button class="btn btn-secondary btn-sm" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container animate-fade-in-up" style="margin-top: 40px;">
+    <!-- Wishlist Analytics Section -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Wishlist Value</div>
+        <div class="stat-value" id="stats-item-value">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎁</div>
+        <div class="stat-label">Items</div>
+        <div class="stat-value" id="stats-item-count">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-label">Reserved</div>
+        <div class="stat-value" id="stats-item-reserved">0</div>
+      </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="items-section" id="items-section">
+      <div class="card">
+        <div class="items-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+          <div>
+            <h1 id="items-wishlist-title" class="gradient-text">Wishlist Items</h1>
+            <p class="text-muted" style="font-size:0.95rem; margin-top:4px;" id="items-wishlist-desc"></p>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <button class="btn btn-primary" id="add-item-btn" onclick="openAddItemModal()">+ Add Item</button>
+            <a href="/dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+          </div>
+        </div>
+        
+        <div class="items-list" id="items-list">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="empty-state hidden" id="items-empty-state" style="padding:60px; text-align:center;">
+          <div class="empty-state-icon" style="font-size:3rem; margin-bottom:16px;">🎯</div>
+          <h3>No items yet</h3>
+          <p class="text-muted">Start adding things you desire to this list!</p>
+          <button class="btn btn-primary" onclick="openAddItemModal()" style="margin-top:16px;">+ Add Your First Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div class="modal-overlay" id="item-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="item-modal-title">Add Item</h2>
+        <button class="modal-close" onclick="closeModal('item-modal')">✕</button>
+      </div>
+      <form onsubmit="handleItemSubmit(event)">
+        <input type="hidden" id="item-edit-id">
+        
+        <!-- Scrape Preview Section (Auto-Fetch Upgrade) -->
+        <div id="scrape-preview-container" class="scrape-preview hidden animate-slide-up">
+          <div class="preview-header">
+            <span class="preview-badge" id="preview-site-badge">Fetched from Amazon</span>
+            <span class="preview-sparkle">✨</span>
+          </div>
+          <div class="preview-body">
+            <div class="preview-thumb">
+              <img id="preview-img" src="" alt="Thumbnail">
+            </div>
+            <div class="preview-info">
+              <div class="preview-title" id="preview-title">Product Title</div>
+              <div class="preview-price" id="preview-price">₹0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="item-name">Item Name</label>
+          <input type="text" class="form-control" id="item-name" placeholder="e.g. Sony WH-1000XM5" required maxlength="100">
+        </div>
+        <div class="form-group">
+          <label for="item-description">Description</label>
+          <textarea class="form-control" id="item-description" placeholder="Details or notes about the item" maxlength="500"></textarea>
+        </div>
+        <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label for="item-price">Price (₹)</label>
+            <input type="number" class="form-control" id="item-price" placeholder="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label for="item-priority">Priority</label>
+            <select class="form-control" id="item-priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="item-url">Product URL</label>
+          <input type="url" class="form-control" id="item-url" placeholder="https://amazon.com/product...">
+        </div>
+        <div class="form-group">
+          <label for="item-image-url">Image URL <span class="text-muted" style="font-size:0.75rem;">(Optional)</span></label>
+          <input type="url" class="form-control" id="item-image-url" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="form-actions" style="display:flex; gap:12px; margin-top:24px;">
+          <button type="submit" class="btn btn-primary" style="flex:2;" id="item-submit-btn">Save Item</button>
+          <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal('item-modal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div >
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/items.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

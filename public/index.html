@@ -7,8 +7,10 @@
   <title>Digital Wishlist Platform</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/js/common.js"></script>
 </head>
 <body>
+  <div class="noise-overlay"></div>
   <div class="ambient-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -23,8 +25,12 @@
         <span>Wishlist</span>
       </div>
       <div class="navbar-actions">
-        <button class="btn btn-secondary btn-sm" id="nav-login-btn" onclick="showAuthSection('login')">Log In</button>
-        <button class="btn btn-primary btn-sm" id="nav-register-btn" onclick="showAuthSection('register')">Sign Up</button>
+        <button class="btn btn-icon theme-toggle-btn" aria-label="Toggle Theme" onclick="toggleTheme()" style="background:transparent; border:none; color:var(--text-primary); cursor:pointer;">
+          <i data-lucide="sun" class="icon-sun"></i>
+          <i data-lucide="moon" class="icon-moon hidden"></i>
+        </button>
+        <a href="/login.html" class="btn btn-secondary btn-sm" id="nav-login-btn">Log In</a>
+        <a href="/register.html" class="btn btn-primary btn-sm" id="nav-register-btn">Sign Up</a>
       </div>
     </div>
   </nav>
@@ -32,52 +38,79 @@
   <!-- Hero Section -->
   <section class="hero" id="hero-section">
     <div class="container">
+      <div class="hero-pill-badge">
+        <span class="pulse-dot"></span>
+        <span>The #1 Wishlist Engine ✨</span>
+      </div>
       <h1>Your <span class="gradient-text">Digital Wishlist</span><br>Made Simple</h1>
-      <p>Create beautiful wishlists, share them with friends and family, and let guests reserve items — no more duplicate gifts!</p>
-      <div>
-        <button class="btn btn-primary btn-lg" onclick="showAuthSection('register')">Get Started Free →</button>
+      <p>Create beautiful wishlists, share them with friends and family, and let guests reserve items — <span class="gradient-text gradient-text-inline">no more duplicate gifts!</span></p>
+      <div class="hero-cta-wrapper">
+        <a href="/register.html" class="btn btn-primary btn-lg">Get Started Free →</a>
+        <div class="social-proof">
+          <div class="avatar-stack">
+            <div class="avatar" style="background: linear-gradient(135deg, #f43f5e, #fb923c);">AJ</div>
+            <div class="avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">MK</div>
+            <div class="avatar" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">SJ</div>
+            <div class="avatar"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></div>
+          </div>
+          <span class="proof-text">Trusted by <strong>12,000+</strong> users</span>
+        </div>
       </div>
 
       <!-- Mock Dashboard Preview overlay inside Hero -->
-      <div class="hero-mockup">
-        <div class="mockup-header">
+      <div class="mockup-wrapper">
+        <div class="hero-mockup">
+          <div class="mockup-header">
            <div class="mockup-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
            <div class="mockup-title">my-wishlist.app</div>
         </div>
         <div class="mockup-body">
             <div class="mockup-item animate-fade-in-up" style="animation-delay: 0.1s;">
-                <div class="item-icon-box"><i data-lucide="camera"></i></div>
+                <div class="item-image-box"><img src="/images/sony_a7iv.png" alt="Sony A7IV"></div>
                 <div class="item-info"><h4>Sony A7IV Mirrorless</h4><p>High Priority • $2,498</p></div>
                 <div class="item-status">Available</div>
             </div>
             <div class="mockup-item reserved animate-fade-in-up" style="animation-delay: 0.3s;">
-                <div class="item-icon-box"><i data-lucide="headphones"></i></div>
+                <div class="item-image-box"><img src="/images/sony_headphones.png" alt="Sony Headphones"></div>
                 <div class="item-info"><h4>Sony WH-1000XM5</h4><p>Medium Priority • $398</p></div>
                 <div class="item-status status-reserved">Reserved</div>
             </div>
             <div class="mockup-item animate-fade-in-up" style="animation-delay: 0.5s;">
-                <div class="item-icon-box"><i data-lucide="coffee"></i></div>
+                <div class="item-image-box"><img src="/images/breville_coffee.png" alt="Breville Coffee"></div>
                 <div class="item-info"><h4>Breville Barista Pro</h4><p>Low Priority • $849</p></div>
                 <div class="item-status">Available</div>
             </div>
         </div>
       </div>
 
-      <div class="hero-features">
-        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.1s">
-          <div class="hero-feature-icon"><i data-lucide="list-todo"></i></div>
-          <h3>Create Lists</h3>
-          <p>Organize your wishes into beautiful, shareable lists</p>
+      <!-- Secondary floating card -->
+      <div class="mockup-secondary-card">
+        <div class="secondary-card-header">
+          <i data-lucide="bell-ring" style="width:16px;height:16px;"></i> Wish Reserved!
         </div>
-        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.2s">
-          <div class="hero-feature-icon"><i data-lucide="share-2"></i></div>
-          <h3>Share Instantly</h3>
-          <p>One unique link for friends and family to view your list</p>
+        <div class="secondary-card-body">
+          <p>Someone secretly claimed the <strong style="color:var(--text-primary);">Sony A7IV Mirrorless</strong>.</p>
         </div>
-        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.3s">
-          <div class="hero-feature-icon"><i data-lucide="check-circle-2"></i></div>
-          <h3>Reserve Items</h3>
-          <p>Guests claim items without logging in — no duplicates</p>
+      </div>
+      
+    </div>
+      <div class="bento-grid">
+        <div class="bento-item bento-large animate-fade-in-up" style="animation-delay: 0.1s">
+          <div class="bento-icon"><i data-lucide="sparkles"></i></div>
+          <div class="bento-content">
+            <h3><span class="gradient-text gradient-text-inline">AI-Assisted</span> Curation</h3>
+            <p>Paste any URL and our engine automatically extracts the product name, price, and cover image in seconds to build your list effortlessly.</p>
+          </div>
+        </div>
+        <div class="bento-item animate-fade-in-up" style="animation-delay: 0.2s">
+          <div class="bento-icon"><i data-lucide="share-2"></i></div>
+          <h3>Share <span class="gradient-text gradient-text-inline">Instantly</span></h3>
+          <p>Generate a unique link. Anyone can view without creating an account.</p>
+        </div>
+        <div class="bento-item animate-fade-in-up" style="animation-delay: 0.3s">
+          <div class="bento-icon"><i data-lucide="check-circle-2"></i></div>
+          <h3><span class="gradient-text gradient-text-inline">Claim & Reserve</span></h3>
+          <p>Guests secretly claim items. No more awkward duplicate gifts.</p>
         </div>
       </div>
     </div>
@@ -87,7 +120,7 @@
   <section class="how-it-works" id="how-it-works">
     <div class="container">
       <div class="section-header text-center">
-        <h2>How It Works</h2>
+        <h2><span class="gradient-text gradient-text-inline">How It Works</span></h2>
         <p class="text-muted">Three simple steps to the perfect gift system</p>
       </div>
       
@@ -116,54 +149,9 @@
     </div>
   </section>
 
-  <!-- Auth Section -->
-  <section class="auth-container hidden" id="auth-section">
-    <div class="card">
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Sign Up</button>
-      </div>
-
-      <!-- Login Form -->
-      <form class="auth-form" id="login-form" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label for="login-email">Email Address</label>
-          <input type="email" class="form-control" id="login-email" placeholder="you@example.com" required>
-        </div>
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required minlength="6">
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-lg" id="login-submit-btn">Log In</button>
-        </div>
-      </form>
-
-      <!-- Register Form -->
-      <form class="auth-form hidden" id="register-form" onsubmit="handleRegister(event)">
-        <div class="form-group">
-          <label for="register-name">Full Name</label>
-          <input type="text" class="form-control" id="register-name" placeholder="Your full name" required maxlength="50">
-        </div>
-        <div class="form-group">
-          <label for="register-email">Email Address</label>
-          <input type="email" class="form-control" id="register-email" placeholder="you@example.com" required>
-        </div>
-        <div class="form-group">
-          <label for="register-password">Password</label>
-          <input type="password" class="form-control" id="register-password" placeholder="Min 6 characters" required minlength="6">
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-lg" id="register-submit-btn">Create Account</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="/js/auth.js"></script>
   <script>lucide.createIcons();</script>
 </body>
 </html>
