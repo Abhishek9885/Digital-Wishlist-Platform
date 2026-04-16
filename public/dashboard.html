@@ -119,6 +119,21 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- Mobile Navigation (Auto-Fetch Upgrade) -->
+  <nav class="mobile-nav">
+    <a href="dashboard.html" class="mobile-nav-item active">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <button class="nav-fab" onclick="openCreateWishlistModal()">
+      <i data-lucide="plus"></i>
+    </button>
+    <a href="#" class="mobile-nav-item" onclick="logout()">
+      <i data-lucide="log-out"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+
   <script src="/js/wishlist.js"></script>
   <script>lucide.createIcons();</script>
 </body>

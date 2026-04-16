@@ -118,7 +118,7 @@
           <label for="item-description">Description</label>
           <textarea class="form-control" id="item-description" placeholder="Details or notes about the item" maxlength="500"></textarea>
         </div>
-        <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div class="form-row responsive-form-row">
           <div class="form-group">
             <label for="item-price">Price (₹)</label>
             <input type="number" class="form-control" id="item-price" placeholder="0" min="0" step="1">
@@ -150,6 +150,21 @@
 
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
+
+  <!-- Mobile Navigation (Auto-Fetch Upgrade) -->
+  <nav class="mobile-nav">
+    <a href="dashboard.html" class="mobile-nav-item">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <button class="nav-fab" onclick="openAddItemModal()">
+      <i data-lucide="plus"></i>
+    </button>
+    <a href="#" class="mobile-nav-item" onclick="logout()">
+      <i data-lucide="log-out"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
 
   <script src="/js/items.js"></script>
   <script>lucide.createIcons();</script>

@@ -89,6 +89,24 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- Mobile Navigation (Guest View) -->
+  <nav class="mobile-nav">
+    <a href="/" class="mobile-nav-item">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <a href="/login.html" class="mobile-nav-item">
+      <div class="nav-fab" style="margin-top: -30px;">
+        <i data-lucide="sparkles"></i>
+      </div>
+      <span>Join Now</span>
+    </a>
+    <button class="mobile-nav-item" onclick="toggleTheme()" style="background:none; border:none;">
+      <i data-lucide="sun"></i>
+      <span>Theme</span>
+    </button>
+  </nav>
+
   <script src="/js/share.js"></script>
   <script>lucide.createIcons();</script>
 </body>
