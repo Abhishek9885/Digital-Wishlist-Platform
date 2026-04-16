@@ -84,17 +84,17 @@ function renderSharePage(wishlist, items) {
 function renderItems(items) {
   const list = document.getElementById('share-items-list');
 
-  list.innerHTML = items.map(item => `
-    <div class="item-card ${item.isReserved ? 'reserved' : ''}" id="share-item-${item._id}">
+  list.innerHTML = items.map((item, index) => `
+    <div class="item-card animate-fade-in-up ${item.isReserved ? 'reserved' : ''}" style="animation-delay: ${index * 0.05}s" id="share-item-${item._id}">
       <div class="item-info">
         <div class="item-name">
-          ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.name)} ↗</a>` : escapeHtml(item.name)}
+          ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.name)} <i data-lucide="external-link" class="icon-xs"></i></a>` : escapeHtml(item.name)}
         </div>
         ${item.description ? `<div class="item-desc">${escapeHtml(item.description)}</div>` : ''}
         <div class="item-meta">
           ${item.price > 0 ? `<span class="item-price">₹${item.price.toLocaleString()}</span>` : ''}
           <span class="badge badge-priority-${item.priority}">${item.priority}</span>
-          ${item.isReserved ? `<span class="badge badge-reserved">🎁 Reserved by ${escapeHtml(item.reservedBy)}</span>` : ''}
+          ${item.isReserved ? `<span class="badge badge-reserved"><i data-lucide="gift" class="icon-sm"></i> Reserved by ${escapeHtml(item.reservedBy)}</span>` : ''}
         </div>
       </div>
       <div class="item-actions">
@@ -108,6 +108,10 @@ function renderItems(items) {
       </div>
     </div>
   `).join('');
+
+  if (window.lucide) {
+    setTimeout(() => lucide.createIcons(), 0);
+  }
 }
 
 async function reserveItem(itemId) {

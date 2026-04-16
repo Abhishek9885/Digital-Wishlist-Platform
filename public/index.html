@@ -6,13 +6,20 @@
   <meta name="description" content="Digital Wishlist Platform — Create, manage, and share wishlists. Let guests reserve items to avoid duplicate gifts.">
   <title>Digital Wishlist Platform</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+  <div class="ambient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
       <div class="navbar-brand">
-        <div class="brand-icon">🎁</div>
+        <div class="brand-icon"><i data-lucide="gift"></i></div>
         <span>Wishlist</span>
       </div>
       <div class="navbar-actions">
@@ -32,20 +39,53 @@
       </div>
 
       <div class="hero-features">
-        <div class="hero-feature">
-          <div class="hero-feature-icon">📝</div>
+        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.1s">
+          <div class="hero-feature-icon"><i data-lucide="list-todo"></i></div>
           <h3>Create Lists</h3>
           <p>Organize your wishes into beautiful, shareable lists</p>
         </div>
-        <div class="hero-feature">
-          <div class="hero-feature-icon">🔗</div>
+        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.2s">
+          <div class="hero-feature-icon"><i data-lucide="share-2"></i></div>
           <h3>Share Instantly</h3>
           <p>One unique link for friends and family to view your list</p>
         </div>
-        <div class="hero-feature">
-          <div class="hero-feature-icon">🎯</div>
+        <div class="hero-feature animate-fade-in-up" style="animation-delay: 0.3s">
+          <div class="hero-feature-icon"><i data-lucide="check-circle-2"></i></div>
           <h3>Reserve Items</h3>
           <p>Guests claim items without logging in — no duplicates</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>How It Works</h2>
+        <p class="text-muted">Three simple steps to the perfect gift system</p>
+      </div>
+      
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-icon"><i data-lucide="wand-2"></i></div>
+          <h3>Curate Your List</h3>
+          <p>Add URLs, prices, and set priorities for exactly what you want.</p>
+        </div>
+        
+        <div class="step-card step-card-middle">
+          <div class="step-number">02</div>
+          <div class="step-icon"><i data-lucide="send"></i></div>
+          <h3>Share Worldwide</h3>
+          <p>Toggle your list to public and send the magical link to anyone.</p>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-icon"><i data-lucide="party-popper"></i></div>
+          <h3>Get What You Want</h3>
+          <p>Friends reserve items securely so you never get duplicates.</p>
         </div>
       </div>
     </div>
@@ -99,5 +139,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="/js/auth.js"></script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>

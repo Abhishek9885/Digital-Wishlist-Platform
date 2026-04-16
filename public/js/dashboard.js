@@ -109,30 +109,34 @@ function renderWishlists(wishlists) {
   }
 
   empty.classList.add('hidden');
-  grid.innerHTML = wishlists.map(wl => `
-    <div class="card wishlist-card" id="wl-${wl._id}">
+  grid.innerHTML = wishlists.map((wl, index) => `
+    <div class="card wishlist-card animate-fade-in-up" style="animation-delay: ${index * 0.05}s" id="wl-${wl._id}">
       <div class="card-header">
         <h3 class="card-title">${escapeHtml(wl.title)}</h3>
         <div class="card-actions">
-          <button class="btn btn-secondary btn-sm btn-icon" onclick="editWishlist('${wl._id}')" title="Edit">✎</button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteWishlist('${wl._id}')" title="Delete">🗑</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editWishlist('${wl._id}')" title="Edit"><i data-lucide="edit-2" class="icon-sm"></i></button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteWishlist('${wl._id}')" title="Delete"><i data-lucide="trash-2" class="icon-sm"></i></button>
         </div>
       </div>
       <div class="card-meta">
-        <span class="badge ${wl.isPublic ? 'badge-public' : 'badge-private'}">${wl.isPublic ? '🌐 Public' : '🔒 Private'}</span>
+        <span class="badge ${wl.isPublic ? 'badge-public' : 'badge-private'}">${wl.isPublic ? '<i data-lucide="globe" class="icon-sm"></i> Public' : '<i data-lucide="lock" class="icon-sm"></i> Private'}</span>
         <span>${formatDate(wl.createdAt)}</span>
       </div>
       ${wl.description ? `<p class="card-description">${escapeHtml(wl.description)}</p>` : ''}
       <div class="card-footer">
-        <button class="btn btn-primary btn-sm" onclick="viewItems('${wl._id}', '${escapeHtml(wl.title)}', '${escapeHtml(wl.description || '')}')">View Items →</button>
+        <button class="btn btn-primary btn-sm" onclick="viewItems('${wl._id}', '${escapeHtml(wl.title)}', '${escapeHtml(wl.description || '')}')">View Items <i data-lucide="arrow-right" class="icon-sm"></i></button>
         ${wl.isPublic ? `
           <span class="share-link" onclick="copyShareLink('${wl.shareToken}')" title="Copy share link">
-            🔗 Copy Link
+            <i data-lucide="copy" class="icon-sm"></i> Copy Link
           </span>
         ` : '<span class="text-muted" style="font-size:0.8rem;">Make public to share</span>'}
       </div>
     </div>
   `).join('');
+
+  if (window.lucide) {
+    setTimeout(() => lucide.createIcons(), 0);
+  }
 }
 
 function openCreateWishlistModal() {
@@ -281,25 +285,29 @@ function renderItems(items) {
   }
 
   empty.classList.add('hidden');
-  list.innerHTML = items.map(item => `
-    <div class="item-card ${item.isReserved ? 'reserved' : ''}" id="item-${item._id}">
+  list.innerHTML = items.map((item, index) => `
+    <div class="item-card animate-fade-in-up ${item.isReserved ? 'reserved' : ''}" style="animation-delay: ${index * 0.05}s" id="item-${item._id}">
       <div class="item-info">
         <div class="item-name">
-          ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.name)} ↗</a>` : escapeHtml(item.name)}
+          ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.name)} <i data-lucide="external-link" class="icon-xs"></i></a>` : escapeHtml(item.name)}
         </div>
         ${item.description ? `<div class="item-desc">${escapeHtml(item.description)}</div>` : ''}
         <div class="item-meta">
           ${item.price > 0 ? `<span class="item-price">₹${item.price.toLocaleString()}</span>` : ''}
           <span class="badge badge-priority-${item.priority}">${item.priority}</span>
-          ${item.isReserved ? `<span class="badge badge-reserved">🎁 Reserved by ${escapeHtml(item.reservedBy)}</span>` : ''}
+          ${item.isReserved ? `<span class="badge badge-reserved"><i data-lucide="gift" class="icon-sm"></i> Reserved by ${escapeHtml(item.reservedBy)}</span>` : ''}
         </div>
       </div>
       <div class="item-actions">
-        <button class="btn btn-secondary btn-sm btn-icon" onclick="editItem('${item._id}')" title="Edit">✎</button>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteItem('${item._id}')" title="Delete">🗑</button>
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editItem('${item._id}')" title="Edit"><i data-lucide="edit-2" class="icon-sm"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteItem('${item._id}')" title="Delete"><i data-lucide="trash-2" class="icon-sm"></i></button>
       </div>
     </div>
   `).join('');
+
+  if (window.lucide) {
+    setTimeout(() => lucide.createIcons(), 0);
+  }
 }
 
 function openAddItemModal() {

@@ -6,15 +6,22 @@
   <meta name="description" content="Manage your wishlists — create, edit, share, and track item reservations.">
   <title>Dashboard — Digital Wishlist Platform</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+  <div class="ambient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
-      <a href="/" class="navbar-brand">
-        <div class="brand-icon">🎁</div>
+      <div class="navbar-brand">
+        <div class="brand-icon"><i data-lucide="gift"></i></div>
         <span>Wishlist</span>
-      </a>
+      </div>
       <div class="navbar-actions">
         <span class="navbar-user" id="user-name-display"></span>
         <button class="btn btn-secondary btn-sm" onclick="logout()">Log Out</button>
@@ -154,5 +161,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="/js/dashboard.js"></script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>
