@@ -58,14 +58,14 @@
     <!-- Items Section -->
     <div class="items-section" id="items-section">
       <div class="card">
-        <div class="items-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
-          <div>
+        <div class="items-header">
+          <div class="items-header-text">
             <h1 id="items-wishlist-title" class="gradient-text">Wishlist Items</h1>
-            <p class="text-muted" style="font-size:0.95rem; margin-top:4px;" id="items-wishlist-desc"></p>
+            <p class="text-muted" id="items-wishlist-desc"></p>
           </div>
-          <div style="display:flex; gap:12px; align-items:center;">
-            <button class="btn btn-primary" id="add-item-btn" onclick="openAddItemModal()">+ Add Item</button>
-            <a href="/dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+          <div class="items-header-actions">
+            <button class="btn btn-primary btn-sm" id="add-item-btn" onclick="openAddItemModal()">+ Add Item</button>
+            <a href="/dashboard.html" class="btn btn-secondary btn-sm"><span class="desktop-only">Back to Dashboard</span><span class="mobile-only">← Back</span></a>
           </div>
         </div>
         
