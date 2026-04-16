@@ -173,6 +173,50 @@ exports.getSharedItems = async (req, res) => {
   }
 };
 
+/**
+ * Helper to extract metadata from JSON-LD structured data
+ */
+const extractJsonLd = ($) => {
+  const metadata = {};
+  $('script[type="application/ld+json"]').each((i, el) => {
+    try {
+      let json = JSON.parse($(el).html());
+      // Flipkart sometimes nests JSON-LD in unusual ways or uses arrays
+      const items = Array.isArray(json) ? json : [json];
+      
+      items.forEach(item => {
+        // Check for Product type (handle both string and array types)
+        const type = item['@type'];
+        const isProduct = type === 'Product' || (Array.isArray(type) && type.includes('Product'));
+        
+        if (isProduct) {
+          metadata.name = metadata.name || item.name;
+          metadata.description = metadata.description || item.description;
+          
+          // Image can be string, object, or array
+          if (item.image) {
+            if (typeof item.image === 'string') metadata.imageUrl = metadata.imageUrl || item.image;
+            else if (Array.isArray(item.image)) metadata.imageUrl = metadata.imageUrl || item.image[0];
+            else if (item.image.url) metadata.imageUrl = metadata.imageUrl || item.image.url;
+          }
+          
+          // Offers contain price info
+          if (item.offers) {
+            const offers = Array.isArray(item.offers) ? item.offers : [item.offers];
+            const firstOffer = offers[0];
+            if (firstOffer.price) {
+              metadata.price = metadata.price || parseFloat(firstOffer.price.toString().replace(/[^\d.]/g, ''));
+            }
+          }
+        }
+      });
+    } catch (e) {
+      // Skip invalid JSON
+    }
+  });
+  return metadata;
+};
+
 // @desc    Scrape product metadata from a URL
 // @route   GET /api/items/scrape?url=...
 exports.scrapeUrl = async (req, res) => {
@@ -192,113 +236,129 @@ exports.scrapeUrl = async (req, res) => {
 
     const sourceSite = detectSite(url);
 
+    // Enhanced headers to bypass basic bot detection
     const { data: html } = await axios.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://www.google.com/'
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Referer': 'https://www.google.com/',
+        'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand)";v="24", "Google Chrome";v="122"',
+        'Sec-Ch-Ua-Mobile': '?0',
+        'Sec-Ch-Ua-Platform': '"Windows"',
+        'Upgrade-Insecure-Requests': '1'
       },
-      timeout: 10000,
-      maxRedirects: 5
+      timeout: 15000,
+      maxRedirects: 10
     });
 
     const $ = cheerio.load(html);
+    
+    // 1. Try JSON-LD first (Most robust for e-commerce)
+    const jsonLdData = extractJsonLd($);
+    
     const metadata = {
-      name: '',
-      price: 0,
-      description: '',
-      imageUrl: '',
+      name: jsonLdData.name || '',
+      price: jsonLdData.price || 0,
+      description: jsonLdData.description || '',
+      imageUrl: jsonLdData.imageUrl || '',
       sourceSite
     };
 
     const cleanPrice = (priceStr) => {
       if (!priceStr) return 0;
-      // Remove all characters except digits, dots, and commas
+      // Remove currency symbols like ₹, $, etc. but keep digits, commas, dots
       let p = priceStr.replace(/[^\d.,]/g, '');
       
-      // Heuristic: If there are multiple commas, they are thousands separators
-      // If there is a dot followed by 2 digits at the end, it's a decimal
       const lastDot = p.lastIndexOf('.');
       const lastComma = p.lastIndexOf(',');
 
       if (lastComma > lastDot) {
-        // Comma is the decimal separator (European style: 1.000,00)
         if (p.length - lastComma === 3) {
           p = p.replace(/\./g, '').replace(',', '.');
         } else {
           p = p.replace(/,/g, '');
         }
       } else {
-        // Dot is the decimal separator (Indian/US style: 1,00,000.00)
         p = p.replace(/,/g, '');
       }
       
       return parseFloat(p) || 0;
     };
 
-    // --- Generic & OG Tags first ---
-    metadata.name = 
+    // 2. Open Graph & Meta Tags (Second best)
+    metadata.name = metadata.name || 
       $('meta[property="og:title"]').attr('content') || 
+      $('meta[name="twitter:title"]').attr('content') ||
       $('meta[name="title"]').attr('content') || 
       $('h1').first().text().trim();
 
-    metadata.imageUrl = 
+    metadata.imageUrl = metadata.imageUrl || 
       $('meta[property="og:image"]').attr('content') ||
+      $('meta[name="twitter:image"]').attr('content') ||
       $('link[rel="image_src"]').attr('href');
 
-    metadata.description = 
+    metadata.description = metadata.description || 
       $('meta[property="og:description"]').attr('content') || 
+      $('meta[name="twitter:description"]').attr('content') ||
       $('meta[name="description"]').attr('content');
 
-    // --- Site-Specific Refinement ---
-    if (sourceSite === 'Amazon') {
-      metadata.name = $('#productTitle').text().trim() || metadata.name;
-      metadata.imageUrl = metadata.imageUrl || $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src') || $('#main-image').attr('src');
-      metadata.description = metadata.description || $('#productDescription').text().trim() || $('#feature-bullets').text().trim();
+    if (metadata.price === 0) {
+      const ogPrice = 
+        $('meta[property="product:price:amount"]').attr('content') || 
+        $('meta[property="og:price:amount"]').attr('content') ||
+        $('meta[name="twitter:label1"]').filter((i, el) => $(el).attr('content')?.toLowerCase().includes('price')).next().attr('content');
       
-      const amazonPrice = 
-        $('.a-price .a-offscreen').first().text() || 
-        $('.a-price-whole').first().text() ||
-        $('#priceblock_ourprice').text() || 
-        $('#priceblock_dealprice').text() ||
-        $('.offer-price').first().text();
-        
-      if (amazonPrice) {
-        metadata.price = cleanPrice(amazonPrice);
-      }
+      if (ogPrice) metadata.price = cleanPrice(ogPrice);
     }
- else if (sourceSite === 'Flipkart') {
-      metadata.name = $('.B_NuCI').text().trim() || metadata.name;
-      metadata.imageUrl = metadata.imageUrl || $('._396cs4._2amPT_._3q69OO img').attr('src') || $('img._2r_T1_').attr('src') || $('.nx-title img').attr('src');
+
+    // 3. Site-Specific Fallbacks (if metadata still missing)
+    if (sourceSite === 'Amazon') {
+      metadata.name = metadata.name || $('#productTitle').text().trim();
+      metadata.imageUrl = metadata.imageUrl || $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src');
       
-      const flipkartPrice = $('._30jeq3._16G7S8').first().text() || $('._30jeq3').first().text();
-      if (flipkartPrice) {
-        const cleaned = flipkartPrice.replace(/[^\d]/g, '');
-        metadata.price = parseFloat(cleaned) || 0;
+      if (metadata.price === 0) {
+        const amazonPrice = $('.a-price .a-offscreen').first().text() || $('#priceblock_ourprice').text();
+        if (amazonPrice) metadata.price = cleanPrice(amazonPrice);
+      }
+    } else if (sourceSite === 'Flipkart') {
+      // Flipkart classes change often, but some attributes are more stable
+      metadata.name = metadata.name || $('.B_NuCI').text().trim() || $('h1').text().trim();
+      
+      if (metadata.price === 0) {
+        const flipPrice = $('._30jeq3').first().text(); // Still trying some common classes
+        if (flipPrice) metadata.price = cleanPrice(flipPrice);
       }
     }
 
-    // --- Price Fallback (Search for currency patterns) ---
+    // 4. Final Generic Price Hunt (regex for currency patterns)
     if (metadata.price === 0) {
-      // Try OG price tags
-      const ogPrice = $('meta[property="product:price:amount"]').attr('content') || $('meta[property="og:price:amount"]').attr('content');
-      if (ogPrice) {
-        metadata.price = cleanPrice(ogPrice);
-      } else {
-        // Look for common price elements on generic pages
-        const genericPrice = $('.price').text() || $('.amount').text() || $('[itemprop="price"]').attr('content');
-        if (genericPrice) {
-          metadata.price = cleanPrice(genericPrice);
+      const priceSelectors = ['.price', '.amount', '[itemprop="price"]', '.product-price', '.current-price'];
+      for (const selector of priceSelectors) {
+        const text = $(selector).first().text();
+        if (text) {
+          metadata.price = cleanPrice(text);
+          if (metadata.price > 0) break;
         }
       }
     }
 
-    // --- Cleanup & Limits ---
-    if (metadata.name && metadata.name.length > 100) {
-      metadata.name = metadata.name.substring(0, 97) + '...';
+    // Cleanup & Limits
+    if (metadata.name && metadata.name.length > 200) {
+      metadata.name = metadata.name.substring(0, 197) + '...';
     }
     if (metadata.description && metadata.description.length > 500) {
       metadata.description = metadata.description.substring(0, 497) + '...';
+    }
+    
+    // Ensure image URL is absolute
+    if (metadata.imageUrl && !metadata.imageUrl.startsWith('http')) {
+      try {
+        const baseUrl = new URL(url);
+        metadata.imageUrl = new URL(metadata.imageUrl, baseUrl.origin).href;
+      } catch (e) {}
     }
 
     res.json(metadata);
