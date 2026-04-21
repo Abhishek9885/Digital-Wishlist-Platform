@@ -2067,4 +2067,56 @@ textarea.form-control {
   }
 }
 
+/* ---- Mobile Performance Optimizations (Optimized for Smoothness) ---- */
+@media (max-width: 768px) {
+  /* Disable high-cost GPU effects */
+  .noise-overlay {
+    display: none !important;
+  }
+
+  /* Optimize background ambient blobs */
+  .orb {
+    filter: blur(60px) !important;
+    animation: none !important;
+    will-change: transform, opacity;
+    opacity: 0.4 !important;
+  }
+  
+  .orb-1 { width: 40rem; height: 40rem; }
+  .orb-2 { width: 40rem; height: 40rem; }
+  .orb-3 { display: none !important; }
+
+  /* Reduce backdrop-filter complexity for smooth scrolling */
+  .navbar, 
+  .card, 
+  .bento-item, 
+  .hero-mockup, 
+  .mockup-secondary-card, 
+  .modal-overlay,
+  .step-card,
+  .stat-card,
+  .mobile-nav,
+  .item-card,
+  .share-link,
+  .stat-badge,
+  .btn-secondary {
+    backdrop-filter: blur(8px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+  }
+
+  /* Promote heavy elements to GPU compositor layer */
+  .btn, .card, .bento-item, .hero-mockup, .step-card, .stat-card, .item-card, .orb {
+    will-change: transform, opacity;
+  }
+
+  /* Relax heavy label animations */
+  .gradient-text {
+    animation-duration: 8s !important;
+  }
+  
+  /* Simplify shadows for mobile */
+  .card:hover, .btn-primary:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+    transform: translateY(-2px) !important;
+  }
 }
