@@ -56,6 +56,10 @@ exports.createItem = async (req, res) => {
 
     res.status(201).json(item);
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(val => val.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
     console.error('Create item error:', error.message);
     res.status(500).json({ message: 'Server error creating item' });
   }
@@ -87,6 +91,10 @@ exports.updateItem = async (req, res) => {
     await item.save();
     res.json(item);
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(val => val.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
     console.error('Update item error:', error.message);
     res.status(500).json({ message: 'Server error updating item' });
   }

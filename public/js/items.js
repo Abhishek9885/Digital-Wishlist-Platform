@@ -318,9 +318,9 @@ async function fetchMetadata(url) {
     const descEl = document.getElementById('item-description');
     const imgEl = document.getElementById('item-image-url');
 
-    if (data.name) nameEl.value = data.name;
+    if (data.name) nameEl.value = data.name.substring(0, nameEl.maxLength > 0 ? nameEl.maxLength : 100);
     if (data.price) priceEl.value = data.price;
-    if (data.description) descEl.value = data.description;
+    if (data.description) descEl.value = data.description.substring(0, descEl.maxLength > 0 ? descEl.maxLength : 500);
     if (data.imageUrl) imgEl.value = data.imageUrl;
     
     // Show Preview Card
