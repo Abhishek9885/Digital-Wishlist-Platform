@@ -326,7 +326,7 @@ async function fetchMetadata(url) {
     // Show Preview Card
     if (data.name) {
       previewTitle.textContent = data.name;
-      previewPrice.textContent = `₹${data.price.toLocaleString('en-IN')}`;
+      previewPrice.textContent = data.price > 0 ? `₹${data.price.toLocaleString('en-IN')}` : 'Price not found';
       previewImg.src = data.imageUrl || 'https://placehold.co/100x100?text=No+Preview';
       
       // Site Badging
