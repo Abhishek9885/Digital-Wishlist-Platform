@@ -328,10 +328,10 @@ exports.scrapeUrl = async (req, res) => {
       metadata.imageUrl = metadata.imageUrl || $('#landingImage').attr('src') || $('#imgTagWrapperId img').attr('src');
       
       if (metadata.price === 0) {
-        const amazonPrice = $('.a-price .a-offscreen').first().text() || 
-                            $('.a-price-whole').first().text() || 
-                            $('#priceblock_ourprice').text() ||
-                            $('.corePriceDisplay_desktop_feature_div .a-price-whole').first().text();
+        const amazonPrice = $('.a-price .a-offscreen').first().text().trim() || 
+                            $('.a-price-whole').first().text().trim() || 
+                            $('#priceblock_ourprice').text().trim() ||
+                            $('.corePriceDisplay_desktop_feature_div .a-price-whole').first().text().trim();
         if (amazonPrice) metadata.price = cleanPrice(amazonPrice);
       }
     } else if (sourceSite === 'Flipkart') {
@@ -339,7 +339,7 @@ exports.scrapeUrl = async (req, res) => {
       metadata.name = metadata.name || $('.B_NuCI').text().trim() || $('h1').text().trim();
       
       if (metadata.price === 0) {
-        const flipPrice = $('._30jeq3').first().text() || $('.Nx9bqj').first().text() || $('div.CEmiEU div').first().text(); 
+        const flipPrice = $('._30jeq3').first().text().trim() || $('.Nx9bqj').first().text().trim() || $('div.CEmiEU div').first().text().trim(); 
         if (flipPrice) metadata.price = cleanPrice(flipPrice);
       }
     }
